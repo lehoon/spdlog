@@ -292,9 +292,19 @@ inline void critical(const T &msg)
 // SPDLOG_LEVEL_OFF
 //
 
+static inline const char *file_name(const char *file) {
+    auto pos = strrchr(file, '/');
+#ifdef _WIN32
+    if(!pos){
+        pos = strrchr(file, '\\');
+    }
+#endif
+    return pos ? pos + 1 : file;
+}
+
 #ifndef SPDLOG_NO_SOURCE_LOC
 #    define SPDLOG_LOGGER_CALL(logger, level, ...)                                                                                         \
-        (logger)->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, level, __VA_ARGS__)
+        (logger)->log(spdlog::source_loc{file_name(__FILE__), __LINE__, SPDLOG_FUNCTION}, level, __VA_ARGS__)
 #else
 #    define SPDLOG_LOGGER_CALL(logger, level, ...) (logger)->log(spdlog::source_loc{}, level, __VA_ARGS__)
 #endif
