@@ -302,9 +302,18 @@ static inline const char *file_name(const char *file) {
     return pos ? pos + 1 : file;
 }
 
+static inline const char *function_name(const char *func) {
+#ifndef _WIN32
+    return func;
+#else
+    auto pos = strrchr(func, ':');
+    return pos ? pos + 1 : func;
+#endif
+}
+
 #ifndef SPDLOG_NO_SOURCE_LOC
 #    define SPDLOG_LOGGER_CALL(logger, level, ...)                                                                                         \
-        (logger)->log(spdlog::source_loc{file_name(__FILE__), __LINE__, SPDLOG_FUNCTION}, level, __VA_ARGS__)
+        (logger)->log(spdlog::source_loc{file_name(__FILE__), __LINE__, function_name(SPDLOG_FUNCTION)}, level, __VA_ARGS__)
 #else
 #    define SPDLOG_LOGGER_CALL(logger, level, ...) (logger)->log(spdlog::source_loc{}, level, __VA_ARGS__)
 #endif
